@@ -1,0 +1,186 @@
+### Variables
+@baseUrl = http://localhost:8080/api
+@contentType = application/json
+
+###############################################
+# CERVEZAS (CRUD Completo)
+###############################################
+
+### 1. Listar todas las cervezas
+GET {{baseUrl}}/beers
+
+### 2. Obtener cerveza por ID
+GET {{baseUrl}}/beer/1
+
+### 3. Crear nueva cerveza
+POST {{baseUrl}}/beer
+Content-Type: {{contentType}}
+
+{
+  "breweryId": 1,
+  "name": "Pale Ale Artesanal",
+  "catId": 1,
+  "styleId": 10,
+  "abv": 5.5,
+  "ibu": 40.0,
+  "srm": 8.0,
+  "upc": 555666,
+  "filepath": "",
+  "descript": "Cerveza pale ale con notas cítricas",
+  "addUser": 1
+}
+
+### 4. Actualizar cerveza completamente (PUT)
+PUT {{baseUrl}}/beer/1
+Content-Type: {{contentType}}
+
+{
+  "breweryId": 1,
+  "name": "IPA Premium Actualizada",
+  "catId": 1,
+  "styleId": 12,
+  "abv": 7.2,
+  "ibu": 75.0,
+  "srm": 14.0,
+  "upc": 123789,
+  "filepath": "/images/ipa-premium.jpg",
+  "descript": "IPA premium con notas cítricas intensas",
+  "addUser": 1
+}
+
+### 5. Actualizar cerveza parcialmente (PATCH) - Solo nombre y ABV
+PATCH {{baseUrl}}/beer/1
+Content-Type: {{contentType}}
+
+{
+  "name": "IPA Doble Hop",
+  "abv": 8.0
+}
+
+### 6. Actualizar cerveza parcialmente (PATCH) - Solo descripción
+PATCH {{baseUrl}}/beer/1
+Content-Type: {{contentType}}
+
+{
+  "descript": "Nueva descripción mejorada de la cerveza"
+}
+
+### 7. Eliminar cerveza
+DELETE {{baseUrl}}/beer/1
+
+###############################################
+# CERVECERAS (Solo lectura)
+###############################################
+
+### 1. Listar todas las cerveceras
+GET {{baseUrl}}/breweries
+
+### 2. Obtener cervecera por ID
+GET {{baseUrl}}/brewerie/1
+
+###############################################
+# CATEGORÍAS (Solo lectura)
+###############################################
+
+### 1. Listar todas las categorías
+GET {{baseUrl}}/categories
+
+### 2. Obtener categoría por ID
+GET {{baseUrl}}/categorie/1
+
+###############################################
+# ESTILOS (Solo lectura)
+###############################################
+
+### 1. Listar todos los estilos
+GET {{baseUrl}}/styles
+
+### 2. Obtener estilo por ID
+GET {{baseUrl}}/style/1
+
+###############################################
+# PRUEBAS DE ERROR
+###############################################
+
+### Cerveza no encontrada (404)
+GET {{baseUrl}}/beer/99999
+
+### Validación - Sin nombre (400)
+POST {{baseUrl}}/beer
+Content-Type: {{contentType}}
+
+{
+  "breweryId": 1,
+  "catId": 1,
+  "styleId": 12,
+  "abv": 6.5,
+  "ibu": 65.0,
+  "srm": 12.0,
+  "upc": 123456,
+  "addUser": 1
+}
+
+###############################################
+# FLUJO COMPLETO DE PRUEBA
+###############################################
+
+### PASO 1: Ver todas las cervezas
+GET {{baseUrl}}/beers
+
+### PASO 2: Crear una cerveza de prueba
+# @name createBeer
+POST {{baseUrl}}/beer
+Content-Type: {{contentType}}
+
+{
+  "breweryId": 1,
+  "name": "Test Stout",
+  "catId": 2,
+  "styleId": 20,
+  "abv": 8.5,
+  "ibu": 50.0,
+  "srm": 35.0,
+  "upc": 999888,
+  "filepath": "",
+  "descript": "Stout de prueba",
+  "addUser": 1
+}
+
+### PASO 3: Obtener la cerveza creada (usar el ID de la respuesta anterior)
+@beerId = {{createBeer.response.body.$.id}}
+GET {{baseUrl}}/beer/{{beerId}}
+
+### PASO 4: Actualizar completamente
+PUT {{baseUrl}}/beer/{{beerId}}
+Content-Type: {{contentType}}
+
+{
+  "breweryId": 1,
+  "name": "Test Stout Mejorada",
+  "catId": 2,
+  "styleId": 20,
+  "abv": 9.0,
+  "ibu": 55.0,
+  "srm": 40.0,
+  "upc": 999888,
+  "filepath": "/img/stout.jpg",
+  "descript": "Stout mejorada con más cuerpo",
+  "addUser": 1
+}
+
+### PASO 5: Actualizar parcialmente
+PATCH {{baseUrl}}/beer/{{beerId}}
+Content-Type: {{contentType}}
+
+{
+  "name": "Super Stout Final"
+}
+
+### PASO 6: Verificar cambios
+GET {{baseUrl}}/beer/{{beerId}}
+
+### PASO 7: Eliminar la cerveza de prueba
+DELETE {{baseUrl}}/beer/{{beerId}}
+
+### PASO 8: Verificar eliminación (debería dar 404)
+GET {{baseUrl}}/beer/{{beerId}}
